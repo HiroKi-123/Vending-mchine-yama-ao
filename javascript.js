@@ -64,10 +64,12 @@ function shouldBuy(product, balance) {
     return product.price <= balance
 }
 
+let balance = 0
 async function payMoney() {
-    const balance = await readUserInput('\nHow much money do you put in? ');
-    console.log(balance, "   coin")
-
+    const tempBalance = await readUserInput('\nHow much money do you put in? ');
+    console.log(tempBalance, "   coin")
+    balance += Number(tempBalance)
+    console.log(`\nTotal balance is ${balance} yen`)
     console.log("\nWhich drink to buy")
     const product = await readUserInput('Enter the name of the drink. ');
     let isHit = false
@@ -79,7 +81,11 @@ async function payMoney() {
             }
             i.stock -= 1
             isHit = true
-            console.log(`${i.name}の残数は ${i.stock}`)
+            balance -= i.price
+            console.log(`\nThere are ${i.stock} ${i.name} remaining  adn your balance is ${balance} yen\n`)
+            for (let i of drink) {
+                console.log(`${i.name}    stock:${i.stock}    price:${i.price} `)
+            }
         }
     }
     if (!isHit) {
@@ -89,33 +95,3 @@ async function payMoney() {
     payMoney()
 };
 payMoney()
-
-// process.stdin.resume();
-// process.stdin.setEncoding('utf8');
-// var lines = [];
-// var reader = require('readline').createInterface({
-//     input: process.stdin,
-//     output: process.stdout
-// });
-// reader.on('line', (I) => {
-//     console.log("push手前", I)
-//     lines.push(I);
-//     reader.close();
-// });
-// reader.on('close', () => {
-//     console.log(lines)
-// })
-
-
-// var reader = require('readline').createInterface({
-//     input: process.stdin,
-//     output: process.stdout
-// });
-
-// let res = reader.question("What's your name? ", answer => {
-//     console.log(`Thank you for your answer : ${answer}`);
-//     reader.close();
-//     return answer
-// })
-
-// console.log(res)
