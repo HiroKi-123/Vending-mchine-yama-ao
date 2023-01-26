@@ -34,7 +34,7 @@ drink = [
     },
     {
         name: "tea",
-        stock: 3,
+        stock: 1,
         price: 100
     },
 ]
@@ -63,15 +63,9 @@ function readUserInput(question) {
     });
 }
 
-function shouldBuy(product, balance) {
-    return product.price <= balance
-}
-
 function replenish() {
     drink.forEach((v, i) => {
-        if (v.stock == InitInventory[i]) {
-            console.log(`${v.name} has not decreased`)
-        } else {
+        if (v.stock != InitInventory[i]) {
             console.log(`Replenished ${InitInventory[i] - v.stock} ${v.name}`)
             v.stock = InitInventory[i]
         }
@@ -94,41 +88,50 @@ function reject() {
 
 async function payMoney() {
     const tempBalance = await readUserInput('\nHow much money do you put in? ');
-    console.log(tempBalance, "   coin")
+    console.log(tempBalance, " 💰💰coin💰💰")
     balance += Number(tempBalance)
     console.log(`\nTotal balance is ${balance} yen`)
-    console.log("\nWhich drink to buy")
-    const product = await readUserInput('Enter the name of the drink. ');
+    console.log(`\nWhich drink to buy `)
+    console.log("----------")
+    drink.forEach(v => console.log(v.name))
+    console.log("----------")
+    const product = await readUserInput('Enter the name of the drink👆 ');
     let isHit = false
     for (let i of drink) {
         if (i.name == product) {
-            if (!shouldBuy(i, balance)) {
-                console.error("ERROR: You don't have enough money to put in.")
+            if (i.price > balance) {
+                console.error("🚨ERROR🚨: You don't have enough money to put in.")
+                return
+            }
+            if (i.stock <= 0) {
+                console.error("🚨ERROR🚨: No drinks stocked.")
                 return
             }
             i.stock -= 1
             isHit = true
             balance -= Number(i.price)
-            console.log(`\nThere are ${i.stock} ${i.name} remaining  adn your balance is ${balance} yen\n`)
+            console.log(`\nThere are ${i.stock} ${i.name} remaining  &  your balance is ${balance} yen`)
+            console.log("------------------------------------------------------\n")
+
             for (let i of drink) {
                 console.log(`${i.name}    stock:${i.stock}    price:${i.price} `)
             }
         }
     }
     if (!isHit) {
-        console.log("No drink of your choice.")
+        console.log("🚨ERROR🚨: No drink of your choice.")
         return
     }
-    const next = await readUserInput('\nchoice the number  1:Retry  2:Fin  3:Replenish  4:paying out  ');
+    const next = await readUserInput('\nchoice the number  1:Retry  2:Fin  3:Replenish  ');
     if (next == 1) {
         payMoney()
     } else if (next == 2) {
-        console.log("Thanks you for use")
-        return
+        reject()
+        console.log("Thanks you for use👋👋\n")
     } else if (next == 3) {
         replenish()
-    } else if (next == 4) {
-        reject()
+    } else {
+        console.log("🚨ERROR🚨: You picked the wrong number.")
     }
 };
 payMoney()
