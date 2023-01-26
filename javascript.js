@@ -38,13 +38,16 @@ drink = [
         price: 100
     },
 ]
+const InitInventory = []
+let balance = 0
 
+for (let i of drink) {
+    InitInventory.push(i.stock)
+}
 for (let i of drink) {
     console.log(`${i.name}    stock:${i.stock}    price:${i.price} `)
 }
 console.log("\nIf you want to buy a drink, put some money in it.")
-
-
 
 function readUserInput(question) {
     const readline = require('readline').createInterface({
@@ -64,7 +67,31 @@ function shouldBuy(product, balance) {
     return product.price <= balance
 }
 
-let balance = 0
+function replenish() {
+    drink.forEach((v, i) => {
+        if (v.stock == InitInventory[i]) {
+            console.log(`${v.name} has not decreased`)
+        } else {
+            console.log(`Replenished ${InitInventory[i] - v.stock} ${v.name}`)
+            v.stock = InitInventory[i]
+        }
+    });
+}
+
+function reject() {
+    let change = {}
+    let moneyType = [10000, 5000, 2000, 1000, 500, 100, 50, 10, 5, 1]
+    moneyType.forEach((v) => {
+        change[v] = 0
+        while (balance >= v) {
+            balance = balance - v
+            change[v] += 1
+        }
+    })
+    console.log("change: ", change)
+}
+
+
 async function payMoney() {
     const tempBalance = await readUserInput('\nHow much money do you put in? ');
     console.log(tempBalance, "   coin")
@@ -81,7 +108,7 @@ async function payMoney() {
             }
             i.stock -= 1
             isHit = true
-            balance -= i.price
+            balance -= Number(i.price)
             console.log(`\nThere are ${i.stock} ${i.name} remaining  adn your balance is ${balance} yen\n`)
             for (let i of drink) {
                 console.log(`${i.name}    stock:${i.stock}    price:${i.price} `)
@@ -92,6 +119,16 @@ async function payMoney() {
         console.log("No drink of your choice.")
         return
     }
-    payMoney()
+    const next = await readUserInput('\nchoice the number  1:Retry  2:Fin  3:Replenish  4:paying out  ');
+    if (next == 1) {
+        payMoney()
+    } else if (next == 2) {
+        console.log("Thanks you for use")
+        return
+    } else if (next == 3) {
+        replenish()
+    } else if (next == 4) {
+        reject()
+    }
 };
 payMoney()
